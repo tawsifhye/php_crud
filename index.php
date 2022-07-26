@@ -28,6 +28,7 @@ $products = $statement->fetchAll(PDO::FETCH_ASSOC);
         <th>#</th>
         <th>Image</th>
         <th>Title</th>
+        <th>Description</th>
         <th>Price</th>
         <th>Create Date</th>
         <th>Action</th>
@@ -39,6 +40,7 @@ $products = $statement->fetchAll(PDO::FETCH_ASSOC);
        <td scope="row"><?php echo $i + 1 ?></td>
        <td><?php echo $product['image'] ?></td>
        <td><?php echo $product['title'] ?></td>
+       <td><?php echo $product['description'] ?></td>
        <td><?php echo $product['price'] ?></td>
        <td><?php echo $product['create_date'] ?></td>
        <td>
