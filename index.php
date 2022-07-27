@@ -19,6 +19,12 @@ $products = $statement->fetchAll(PDO::FETCH_ASSOC);
 
     <title>PHP Crud</title>
   </head>
+  <?php
+function test()
+{
+    echo 'Hello';
+}
+?>
   <body>
     <h1>Product Crud</h1>
       <a href="create.php"type="button" class="btn btn-success mb-3">Add Product</a>
@@ -45,11 +51,12 @@ $products = $statement->fetchAll(PDO::FETCH_ASSOC);
        <td><?php echo $product['create_date'] ?></td>
        <td>
         <button type="button" class="btn btn-sm btn-outline-primary">Edit</button>
-        <button type="button" class="btn btn-sm btn-outline-danger" data-toggle="button" aria-pressed="false" autocomplete="off">Delete</button>
+        <a href="delete.php?id=<?php echo $product['id'] ?>" type="button" class="btn btn-sm btn-outline-danger" data-toggle="button" aria-pressed="false" autocomplete="off">Delete</a>
        </td>
      </tr>
      <?php }?>
     </tbody>
   </table>
+
   </body>
 </html>
