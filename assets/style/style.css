@@ -1,5 +1,5 @@
 body {
-    padding: 50px;
+    padding: 50px
 }
 
 /* input[type='number'] {
@@ -9,4 +9,10 @@ body {
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
+}
+
+img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
 }
