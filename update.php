@@ -2,18 +2,29 @@
 $pdo = new PDO('mysql:host=localhost;port=3306;dbname=products_crud', 'root', '');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+$id = $_GET['id'] ?? null;
+
+if (!$id) {
+    header('Location: index.php');
+    exit;
+}
+
+$statement = $pdo->prepare('SELECT * FROM products WHERE id = :id');
+$statement->bindValue(':id', $id);
+$statement->execute();
+$product = $statement->fetch(PDO::FETCH_ASSOC);
+
 $errors = [];
-$title = '';
-$description = '';
-$price = '';
-$imagePath = '';
+$title = $product['title'];
+$description = $product['description'] ?? '';
+$price = $product['price'];
+$imagePath = $product['image'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $description = $_POST['description'];
     $price = $_POST['price'];
-    $date = date('Y-m-d H:i:s');
-    $imagePath = '';
+    $imagePath = $product['image'] ?? 'tf';
     if (!$title) {
         $errors[] = 'Product title is required';
     }
@@ -26,10 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-
         $image = $_FILES['image'] ?? null;
+        $imagePath = $product['image'];
 
-        if ($image) {
+        if ($image && $image['tmp_name']) {
+            if ($product['image']) {
+                unlink($product['image']);
+
+            }
             $imagePath = 'images/' . randomString(8) . '/' . $image['name'];
             mkdir(dirname($imagePath));
             var_dump($imagePath);
@@ -37,16 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             move_uploaded_file($image['tmp_name'], $imagePath);
         }
         try {
-            $statement = $pdo->prepare("INSERT INTO products (title, description, image, price, create_date)
-                VALUES (:title, :description, :image , :price, :date)");
+            $statement = $pdo->prepare("UPDATE products SET title =:title, description=:description, image=:image, price:=price WHERE id=:id");
 
             $statement->bindValue(':title', $title);
-            $statement->bindValue(':image', $imagePath);
             $statement->bindValue(':description', $description);
+            $statement->bindValue(':image', $imagePath);
             $statement->bindValue(':price', $price);
-            $statement->bindValue(':date', $date);
+            $statement->bindValue(':id', $id);
             $statement->execute();
-            header('Location: index.php');
+
+            // header('Location: index.php');
         } catch (PDOException $e) {
             echo "Connection failed: " . $e->getMessage();
         }
@@ -67,7 +82,6 @@ function randomString($n)
 
     return $str;
 }
-
 ?>
 
 <!doctype html>
@@ -83,7 +97,7 @@ function randomString($n)
     <title>PHP Crud</title>
   </head>
   <body>
-    <h1>Add Product</h1>
+    <h1>Update Product <strong><?php echo $product['title'] ?></strong></h1>
     <?php if (!empty($errors)): ?>
       <div class="alert alert-warning" role="alert">
       <?php foreach ($errors as $error) {?>
@@ -97,7 +111,10 @@ function randomString($n)
 
 
     <form action="" method="post" enctype="multipart/form-data">
-  <div class="form-group">
+  <?php if ($product['image']): ?>
+    <img src="<?php echo $product['image'] ?>" alt="">
+    <?php endif?>
+    <div class="form-group">
     <label>Product Image</label>
     <br>
     <input type="file" name="image">
@@ -108,7 +125,9 @@ function randomString($n)
 </div>
   <div class="form-group">
     <label>Description</label>
-    <textarea class="form-control" name="description"><?php echo $description ?></textarea>
+    <textarea class="form-control" name="description">
+    <?php echo $description ?>
+</textarea>
 </div>
 
 <div class="form-group">
