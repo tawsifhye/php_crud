@@ -1,24 +1,15 @@
 <?php
-echo '<pre>';
-var_dump($_GET);
+$pdo = new PDO('mysql:host=localhost;port=3306;dbname=products_crud', 'root', '');
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-echo '</pre>';
+$id = $_POST['id'] ?? null;
+var_dump($id);
+if (!$id) {
+    header('Location: index.php');
+}
 
-?>
+$statement = $pdo->prepare('DELETE FROM products WHERE id = :id');
+$statement->bindValue(':id', $id);
+$statement->execute();
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="assets/style/style.css">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-
-    <title>PHP Crud</title>
-  </head>
-<body>
-<h1>Delete Product</h1>
-</body>
-</html>
+header('Location: index.php');
